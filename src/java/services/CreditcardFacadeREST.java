@@ -4,11 +4,13 @@
 
 package services;
 
-import entities.Creditcard;
+import entities.CreditAccount;
+import entities.CreditCard;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,25 +26,29 @@ import javax.ws.rs.Produces;
  */
 @Stateless
 @Path("entities.creditcard")
-public class CreditcardFacadeREST extends AbstractFacade<Creditcard> {
+public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
     @PersistenceContext(unitName = "PaymentGatewayWebPU")
     private EntityManager em;
 
     public CreditcardFacadeREST() {
-        super(Creditcard.class);
+        super(CreditCard.class);
     }
 
     @POST
     @Override
     @Consumes({"application/xml", "application/json"})
-    public void create(Creditcard entity) {
+    public void create(CreditCard entity) {
+        CreditAccount account = new CreditAccount();
+        account.setCard(entity);
+        account.setAmount(500f);
+        entity.setCreditAccount(account);
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({"application/xml", "application/json"})
-    public void edit(@PathParam("id") Integer id, Creditcard entity) {
+    public void edit(@PathParam("id") Integer id, CreditCard entity) {
         super.edit(entity);
     }
 
@@ -55,21 +61,21 @@ public class CreditcardFacadeREST extends AbstractFacade<Creditcard> {
     @GET
     @Path("{id}")
     @Produces({"application/xml", "application/json"})
-    public Creditcard find(@PathParam("id") Integer id) {
+    public CreditCard find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({"application/xml", "application/json"})
-    public List<Creditcard> findAll() {
+    public List<CreditCard> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({"application/xml", "application/json"})
-    public List<Creditcard> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<CreditCard> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
@@ -86,12 +92,32 @@ public class CreditcardFacadeREST extends AbstractFacade<Creditcard> {
     }
     
     @GET
-    @Path("{amount}")
-    @Consumes({"application/xml", "application/json"})
-    public boolean validate(@PathParam("amount") double amount, Creditcard entity) {
+    @Path("{cardnumber}/{holdername}/{expireddate}/{securecode}/{amount}")
+    @Produces("text/plain")
+    public boolean validate(
+            @PathParam("cardnumber") String cardnumber,
+            @PathParam("holdername") String holdername,
+            @PathParam("expireddate") String expiredate,
+            @PathParam("securecode") String securecode,
+            @PathParam("amount") double amount
+            ) {
         
+        TypedQuery<CreditCard> query = em.createNamedQuery("Creditcard.findByCardnumber", CreditCard.class);
+        query.setParameter("cardnumber", cardnumber);
+        List<CreditCard> cards = query.getResultList();
         
-        return amount>0;
+        if (cards.size()<=0) return false;
+        if (cards.get(0).getCardholdername() != null &&
+                cards.get(0).getCardholdername().toUpperCase().compareTo(holdername.toUpperCase()) != 0) return false;
+        if (cards.get(0).getExpirydate() != null &&
+                cards.get(0).getExpirydate().compareTo(expiredate) != 0) return false;
+        if (cards.get(0).getSecuritycode() != null &&
+                cards.get(0).getSecuritycode().compareTo(securecode) != 0) return false;
+        
+        //check credit limit
+        //if (cards.get(0).getCreditLimit() < amount) return false;
+        
+        return true;
     }
     
 }
