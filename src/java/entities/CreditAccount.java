@@ -7,16 +7,11 @@
 package entities;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -29,58 +24,42 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "CreditAccount.findAll", query = "SELECT c FROM CreditAccount c"),
-    @NamedQuery(name = "CreditAccount.findById", query = "SELECT c FROM CreditAccount c WHERE c.id = :id"),
-    @NamedQuery(name = "CreditAccount.findByAmount", query = "SELECT c FROM CreditAccount c WHERE c.amount = :amount")})
+    @NamedQuery(name = "CreditAccount.findById", query = "SELECT c FROM CreditAccount c WHERE c.id = :id")
+ })
 public class CreditAccount implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "ID")
-    private Integer id;
+    @Column(name = "CardNumber")
+    private String id;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "Amount")
-    private Float amount;
+    @Column(name = "CreditLimit")
+    private double CreditLimit;
     
-    @JoinColumn(name = "CardNumber", referencedColumnName = "CARDNUMBER")
-    @OneToOne(optional = false)
-    private CreditCard card;
-
     public CreditAccount() {
     }
     
-//    public CreditAccount(CreditCard card) {
-//        
-//        this.cardNumber = card;
-//    }
-
-    public CreditAccount(Integer id) {
-        this.id = id;
+    public CreditAccount(String cardNumber, double creditLimit) {
+        
+        this.id = cardNumber;
+        this.CreditLimit = creditLimit;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Float getAmount() {
-        return amount;
+    public double getCreditLimit() {
+        return CreditLimit;
     }
 
-    public void setAmount(Float amount) {
-        this.amount = amount;
+    public void setCreditLimit(double amount) {
+        this.CreditLimit = amount;
     }
 
-    public CreditCard getCard() {
-        return card;
-    }
-
-    public void setCard(CreditCard card) {
-        this.card = card;
-    }
 
     @Override
     public int hashCode() {

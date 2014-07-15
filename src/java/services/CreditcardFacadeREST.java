@@ -38,10 +38,11 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
     @Override
     @Consumes({"application/xml", "application/json"})
     public void create(CreditCard entity) {
-        CreditAccount account = new CreditAccount();
-        account.setCard(entity);
-        account.setAmount(500f);
-        entity.setCreditAccount(account);
+        
+        //Adding into CreditAccount
+        CreditAccount account = new CreditAccount(entity.getCardnumber(), 500);
+        em.persist(account);
+        
         super.create(entity);
     }
 
@@ -115,9 +116,35 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
                 cards.get(0).getSecuritycode().compareTo(securecode) != 0) return false;
         
         //check credit limit
-        //if (cards.get(0).getCreditLimit() < amount) return false;
+        CreditAccount account = em.find(CreditAccount.class, cardnumber);
+        if (account == null) return false;
+        if (account.getCreditLimit()< amount) return false;
         
         return true;
+    }
+    
+    @GET
+    @Path("{cardnumber}/{holdername}/{expireddate}/{securecode}/{amount}/{withdraw}")
+    @Produces("text/plain")
+    public double withdraw(
+            @PathParam("cardnumber") String cardnumber,
+            @PathParam("holdername") String holdername,
+            @PathParam("expireddate") String expiredate,
+            @PathParam("securecode") String securecode,
+            @PathParam("amount") double amount,
+            @PathParam("withdraw") boolean withdraw
+            ) {
+        
+        if (!withdraw) return 0;
+        
+        if (!validate(cardnumber, holdername, expiredate, securecode, amount)) return 0;
+        
+        CreditAccount account = em.find(CreditAccount.class, cardnumber);
+        if (account == null) return 0;
+        account.setCreditLimit(account.getCreditLimit() - amount);
+        em.persist(account);
+    
+        return amount;
     }
     
 }
