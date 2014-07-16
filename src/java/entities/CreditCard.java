@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -27,11 +26,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Creditcard.findAll", query = "SELECT c FROM CreditCard c"),
     @NamedQuery(name = "Creditcard.findById", query = "SELECT c FROM CreditCard c WHERE c.id = :id"),
-    @NamedQuery(name = "Creditcard.findByDtype", query = "SELECT c FROM CreditCard c WHERE c.dtype = :dtype"),
-    @NamedQuery(name = "Creditcard.findByCardnumber", query = "SELECT c FROM CreditCard c WHERE c.cardnumber = :cardnumber"),
-    @NamedQuery(name = "Creditcard.findByCardholdername", query = "SELECT c FROM CreditCard c WHERE c.cardholdername = :cardholdername"),
-    @NamedQuery(name = "Creditcard.findByExpirydate", query = "SELECT c FROM CreditCard c WHERE c.expirydate = :expirydate"),
-    @NamedQuery(name = "Creditcard.findBySecuritycode", query = "SELECT c FROM CreditCard c WHERE c.securitycode = :securitycode")})
+    @NamedQuery(name = "Creditcard.findByCardnumber", query = "SELECT c FROM CreditCard c WHERE c.cardNumber = :cardnumber"),
+    @NamedQuery(name = "Creditcard.findByCardholdername", query = "SELECT c FROM CreditCard c WHERE c.cardholderName = :cardholdername")
+})
 public class CreditCard implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -39,76 +36,56 @@ public class CreditCard implements Serializable {
     @Basic(optional = false)
     @Column(name = "ID")
     private Integer id;
-    @Size(max = 31)
-    @Column(name = "DTYPE")
-    private String dtype;
-    @Size(max = 255)
+    
     @Column(name = "CARDNUMBER")
-    private String cardnumber;
-    @Size(max = 255)
+    private String cardNumber;
     @Column(name = "CARDHOLDERNAME")
-    private String cardholdername;
-    @Size(max = 255)
+    private String cardholderName;
     @Column(name = "EXPIRYDATE")
-    private String expirydate;
-    @Size(max = 255)
+    private String expiryDate;
     @Column(name = "SECURITYCODE")
-    private String securitycode;
+    private String securityCode;
     
 
     public CreditCard() {
     }
 
-    public CreditCard(Integer id) {
-        this.id = id;
-    }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public String getDtype() {
-        return dtype;
+    public void setCardNumber(String cardnumber) {
+        this.cardNumber = cardnumber;
     }
 
-    public void setDtype(String dtype) {
-        this.dtype = dtype;
+    public String getCardholderName() {
+        return cardholderName;
     }
 
-    public String getCardnumber() {
-        return cardnumber;
+    public void setCardholderName(String cardholdername) {
+        this.cardholderName = cardholdername;
     }
 
-    public void setCardnumber(String cardnumber) {
-        this.cardnumber = cardnumber;
+    public String getExpiryDate() {
+        return expiryDate;
     }
 
-    public String getCardholdername() {
-        return cardholdername;
+    public void setExpiryDate(String expirydate) {
+        this.expiryDate = expirydate;
     }
 
-    public void setCardholdername(String cardholdername) {
-        this.cardholdername = cardholdername;
+    public String getSecurityCode() {
+        return securityCode;
     }
 
-    public String getExpirydate() {
-        return expirydate;
-    }
-
-    public void setExpirydate(String expirydate) {
-        this.expirydate = expirydate;
-    }
-
-    public String getSecuritycode() {
-        return securitycode;
-    }
-
-    public void setSecuritycode(String securitycode) {
-        this.securitycode = securitycode;
+    public void setSecurityCode(String securitycode) {
+        this.securityCode = securitycode;
     }
     
 
