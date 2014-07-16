@@ -39,9 +39,20 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
     @Consumes({"application/xml", "application/json"})
     public void create(CreditCard entity) {
         
+        if (entity == null) return;
+        
+        System.out.println("Create CreditCard: " + entity);
+        
+        TypedQuery<CreditCard> query = em.createNamedQuery("Creditcard.findByCardnumber", CreditCard.class);
+        query.setParameter("cardnumber", entity.getCardNumber());
+        List<CreditCard> cards = query.getResultList();
+        if (cards.size()>0) return;
+        
         //Adding into CreditAccount
-        CreditAccount account = new CreditAccount(entity.getCardnumber(), 500);
+        CreditAccount account = new CreditAccount(entity.getCardNumber(), 500);
         em.persist(account);
+        
+        System.out.println("CreditAccount added.");
         
         super.create(entity);
     }
@@ -108,12 +119,12 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
         List<CreditCard> cards = query.getResultList();
         
         if (cards.size()<=0) return false;
-        if (cards.get(0).getCardholdername() != null &&
-                cards.get(0).getCardholdername().toUpperCase().compareTo(holdername.toUpperCase()) != 0) return false;
-        if (cards.get(0).getExpirydate() != null &&
-                cards.get(0).getExpirydate().compareTo(expiredate) != 0) return false;
-        if (cards.get(0).getSecuritycode() != null &&
-                cards.get(0).getSecuritycode().compareTo(securecode) != 0) return false;
+        if (cards.get(0).getCardholderName() != null &&
+                cards.get(0).getCardholderName().toUpperCase().compareTo(holdername.toUpperCase()) != 0) return false;
+        if (cards.get(0).getExpiryDate() != null &&
+                cards.get(0).getExpiryDate().compareTo(expiredate) != 0) return false;
+        if (cards.get(0).getSecurityCode() != null &&
+                cards.get(0).getSecurityCode().compareTo(securecode) != 0) return false;
         
         //check credit limit
         CreditAccount account = em.find(CreditAccount.class, cardnumber);
