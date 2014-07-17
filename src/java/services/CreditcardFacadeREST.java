@@ -119,6 +119,7 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
         List<CreditCard> cards = query.getResultList();
         
         if (cards.size()<=0) return false;
+        
         if (cards.get(0).getCardholderName() != null &&
                 cards.get(0).getCardholderName().toUpperCase().compareTo(holdername.toUpperCase()) != 0) return false;
         if (cards.get(0).getExpiryDate() != null &&
