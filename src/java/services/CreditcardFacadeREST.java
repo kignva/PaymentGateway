@@ -6,6 +6,7 @@ package services;
 
 import entities.CreditAccount;
 import entities.CreditCard;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -114,11 +115,27 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
             @PathParam("amount") double amount
             ) {
         
+        System.out.println("------------------------------------");
+        System.out.println("Card validation [" + new Date() + "]");
+        System.out.println("CardNumber=" + cardnumber);
+        
+        
+        
         TypedQuery<CreditCard> query = em.createNamedQuery("Creditcard.findByCardnumber", CreditCard.class);
         query.setParameter("cardnumber", cardnumber);
         List<CreditCard> cards = query.getResultList();
         
-        if (cards.size()<=0) return false;
+        if (cards.size()<=0) {
+            
+            System.out.println("CardNumber not exist.");
+            System.out.println("------------------------------------");
+            return false;
+        }
+        
+        System.out.println("HolderName=" + holdername + ", PG:" + cards.get(0).getCardholderName());
+        System.out.println("ExpiredDate=" + expiredate + ", PG:" + cards.get(0).getExpiryDate());
+        System.out.println("SecurityCode=" + securecode + ", PG:" + cards.get(0).getSecurityCode());
+        
         
         if (cards.get(0).getCardholderName() != null &&
                 cards.get(0).getCardholderName().toUpperCase().compareTo(holdername.toUpperCase()) != 0) return false;
@@ -130,6 +147,10 @@ public class CreditcardFacadeREST extends AbstractFacade<CreditCard> {
         //check credit limit
         CreditAccount account = em.find(CreditAccount.class, cardnumber);
         if (account == null) return false;
+        
+        System.out.println("Amount=" + amount + ", PG:" + account.getCreditLimit());
+        System.out.println("------------------------------------");
+        
         if (account.getCreditLimit()< amount) return false;
         
         return true;
